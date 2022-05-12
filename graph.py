@@ -1,9 +1,6 @@
 import random
-from re import S
-from tkinter import N
-from tkinter.messagebox import RETRY
 from edge import *
-from functions import check_graphic_sequence
+from functions import *
 from node import *
 from operator import itemgetter
 import networkx as nx
@@ -14,6 +11,7 @@ class Graph:
     def __init__(self, nodes=[], edges=[]):
         self.nodes = [n for n in nodes]
         self.edges = [e for e in edges]
+        self.weight = [0 for _ in edges]
 
     def add_node(self, node):
         self.nodes.append(node)
@@ -32,7 +30,8 @@ class Graph:
             self.add_node(Node(i))
 
     def add_neighbour(self, node_index, neighbour):
-        if node_index == neighbour or neighbour in self.nodes[node_index].neighbours:
+        if node_index == neighbour or neighbour in self.nodes[
+            node_index].neighbours:
             return False
         self.nodes[node_index].neighbours.append(neighbour)
         return True
@@ -44,12 +43,13 @@ class Graph:
 
     def find_edge(self, idx1, idx2):
         for i, edge in enumerate(self.edges):
-            if (edge.start == idx1 and edge.end == idx2) or (edge.start == idx2 and edge.end == idx1):
+            if (edge.start == idx1 and edge.end == idx2) or (
+                    edge.start == idx2 and edge.end == idx1):
                 return edge, i
         return None, -1
 
     def edge_exists(self, index1, index2):
-        _, index =  self.find_edge(index1, index2)
+        _, index = self.find_edge(index1, index2)
         return index >= 0
 
     def delete_edge(self, idx1, idx2):
@@ -62,6 +62,7 @@ class Graph:
     def delete_all(self):
         self.nodes = []
         self.edges = []
+        self.weight = []
 
     ############################# PROJECT1 ################################
 
@@ -74,8 +75,8 @@ class Graph:
         for i in range(rows):
             line = lines[i].split(' ')
             for j in range(len(line)):
-                self.add_neighbour(i, int(line[j])-1)
-                self.add_edge(i, int(line[j])-1)
+                self.add_neighbour(i, int(line[j]) - 1)
+                self.add_edge(i, int(line[j]) - 1)
 
     def fill_from_adjacency_matrix(self, filename):
         with open(filename, 'r') as f:
@@ -133,9 +134,9 @@ class Graph:
     def create_nx_graph(self):
         G = nx.Graph()
         for node in self.nodes:
-            G.add_node(node.number+1)
+            G.add_node(node.number + 1)
         for edge in self.edges:
-            G.add_edge(edge.start+1, edge.end+1)
+            G.add_edge(edge.start + 1, edge.end + 1)
         return G
 
     def draw_nx_graph(self):
@@ -145,12 +146,12 @@ class Graph:
 
     ##### ex 3 #####
     def fill_random_NL(self, n, l):
-        if l > (n*(n-1))/2:
+        if l > (n * (n - 1)) / 2:
             return False
         self.add_nodes(n)
         while len(self.edges) < l:
-            index1 = random.randint(0,n-1)
-            index2 = random.randint(0,n-1)
+            index1 = random.randint(0, n - 1)
+            index2 = random.randint(0, n - 1)
             self.add_edge(index1, index2)
             self.add_neighbours(index1, index2)
         return True
@@ -177,7 +178,7 @@ class Graph:
             seq.sort(reverse=True, key=itemgetter(1))
             if all(el[1] == 0 for el in seq):
                 break
-            for i in range(1, seq[0][1]+1):
+            for i in range(1, seq[0][1] + 1):
                 seq[i][1] -= 1
                 self.add_edge(seq[0][0], seq[i][0])
                 self.add_neighbours(seq[0][0], seq[i][0])
@@ -197,16 +198,15 @@ class Graph:
         self.nodes[c].delete_neighbour(d)
         self.nodes[d].delete_neighbour(c)
 
-        self.add_neighbours(a,d)
-        self.add_neighbours(c,b)
-
+        self.add_neighbours(a, d)
+        self.add_neighbours(c, b)
 
     def randomize_edges(self, n, seq):
         self.fill_from_graphic_sequence(seq)
         for _ in range(n):
             while True:
-                idx1 = random.randint(0, len(self.edges)-1)
-                idx2 = random.randint(0, len(self.edges)-1)
+                idx1 = random.randint(0, len(self.edges) - 1)
+                idx2 = random.randint(0, len(self.edges) - 1)
                 if idx1 != idx2:
                     break
             self.swap_edges(self.edges[idx1], self.edges[idx2])
@@ -249,7 +249,7 @@ class Graph:
         seq = []
         for _ in range(n):
             a = 1
-            b = int(n * (n-1) / 4)
+            b = int(n * (n - 1) / 4)
             value = random.randint(a, b) * 2
 
             seq.append(value)
@@ -270,7 +270,6 @@ class Graph:
             seq = self.generate_even_sequence(n)
             self.fill_from_graphic_sequence(seq)
 
-
     def create_copy(self):
         copy = Graph()
         copy.nodes = [n for n in self.nodes]
@@ -285,7 +284,7 @@ class Graph:
 
     def find_euler_cycle(self):
         copy = self.create_copy()
-        start_index = random.randint(0, len(copy.nodes)-1)
+        start_index = random.randint(0, len(copy.nodes) - 1)
         current_node = Node.create_copy(copy.nodes[start_index])
         # current_node = copy.nodes[start_index].create_copy()
         euler_cycle = [current_node.number]
@@ -300,18 +299,22 @@ class Graph:
 
                 if not is_bridge:
                     copy.delete_edge(current_node.number, neighbour_idx)
-                    copy.nodes[current_node.number].delete_neighbour(neighbour_idx)
-                    copy.nodes[neighbour_idx].delete_neighbour(current_node.number)
+                    copy.nodes[current_node.number].delete_neighbour(
+                        neighbour_idx)
+                    copy.nodes[neighbour_idx].delete_neighbour(
+                        current_node.number)
                     current_node = copy.nodes[neighbour_idx]
                     euler_cycle.append(current_node.number)
                 elif len(current_node.neighbours) == 1:
                     # copy.delete_node(current_node.num)
                     copy.delete_edge(current_node.number, neighbour_idx)
-                    copy.nodes[current_node.number].delete_neighbour(neighbour_idx)
-                    copy.nodes[neighbour_idx].delete_neighbour(current_node.number)
+                    copy.nodes[current_node.number].delete_neighbour(
+                        neighbour_idx)
+                    copy.nodes[neighbour_idx].delete_neighbour(
+                        current_node.number)
                     current_node = copy.nodes[neighbour_idx]
                     euler_cycle.append(current_node.number)
-                    
+
         return euler_cycle
 
     ##### ex 5 #####
@@ -353,9 +356,87 @@ class Graph:
                 cycle.append(0)
             else:
                 print("Ścieżka Hamiltona:")
-            print([number+1 for number in stack])
+            print([number + 1 for number in stack])
             return cycle
         return None
+
+    ############################# PROJECT3 ################################
+
+    ##### ex 1 #####
+
+    def generate_random_graph(self, min_nodes, max_nodes):
+        # randomizes the number of nodes from the range
+        # [min_nodes, max_nodes]
+        nodes = random.randint(min_nodes, max_nodes)
+
+        # min number of edges for coherent graph is n-1, max is n(n-1)/2
+        edges = random.randint(nodes - 1, int(nodes * (nodes - 1) / 2))
+        self.fill_random_NL(nodes, edges)
+
+    def generate_random_coherent_graph(self, min_nodes, max_nodes):
+
+        self.generate_random_graph(min_nodes, max_nodes)
+        while not self.is_coherent():
+            self.delete_all()
+            self.generate_random_graph(min_nodes, max_nodes)
+
+    def add_random_weight(self):
+        self.weight = [random.randint(1, 10) for _ in range(len(self.edges))]
+
+    def draw_nx_graph_with_weight(self):
+        G = nx.Graph()
+        for node in self.nodes:
+            G.add_node(node.number)
+        for edge, weight in zip(self.edges, self.weight):
+            G.add_edge(edge.start, edge.end, weight=weight)
+        pos = nx.spring_layout(G)
+        nx.draw_networkx(G, pos, with_labels=True, font_weight='bold')
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        plt.show()
+
+    ##### ex 2 #####
+
+    def init_d_p(self, d, p, s):
+        for i in range(len(self.nodes)):
+            d.append(float('inf'))
+            p.append(None)
+        d[s] = 0
+
+    def relax(self, u, neighbour, d, p):  # ( take in eeeeeesy LOVE MIKA)
+        edges = [(edge.start, edge.end) for edge in self.edges]
+        try:
+            index = edges.index((u, neighbour))
+        except ValueError:
+            index = edges.index((neighbour, u))
+        weight = self.weight[index]
+        if d[neighbour] > (d[u] + weight):
+            d[neighbour] = (d[u] + weight)
+            p[neighbour] = u
+
+    def dijkstra(self, p, d, s, print_s=True):
+
+        self.init_d_p(d, p, s)
+        S = []  # 'ready' nodes
+        while len(S) != len(self.nodes):
+            u = find_node_with_smallest_d(S, d)
+            S.append(u)
+            for neighbour in self.nodes[u].neighbours:
+                if neighbour not in S:
+                    self.relax(u, neighbour, d, p)
+
+        if print_s:
+            print_S(S, d, p)
+
+    ##### ex 3 #####
+
+    def distance_matrix(self, matrix):
+        for i in range(len(self.nodes)):
+            distance = []
+            predecessor = []
+            self.dijkstra(predecessor, distance, i, False)
+            matrix[i] = distance
+
 
 
 

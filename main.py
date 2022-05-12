@@ -24,7 +24,7 @@ if __name__=="__main__":
     seq_graphic = [ 4, 2, 2, 3, 2, 1, 4, 2, 2, 2, 2]
 
     if args.project == 1:
-        if  args.ex == 1:
+        if args.ex == 1:
             print('---Graf z listy sąsiedztwa---')
             graph.fill_from_adjacency_list("./files/AL.txt")
             graph.print_all_representations()
@@ -38,7 +38,7 @@ if __name__=="__main__":
         if args.ex == 2:
             graph.fill_random_NP(5, 0.8)
             graph.draw_nx_graph()
-        if  args.ex == 3:
+        if args.ex == 3:
             graph.fill_random_NL(5,3)
             print("---Graf losowy(n,l)---")
             graph.print_all_representations()
@@ -66,7 +66,34 @@ if __name__=="__main__":
             # graph.fill_from_graphic_sequence([3,4,3,4,3,3,3,3]) # z tego na pewno będzie cykl hamiltona
             graph.fill_k_regular(6, 3)
             graph.find_hamilton_cycle()
-    graph.print_all_representations()
+    if args.project == 3:
+        if args.ex == 1:
+            print("---Spójny graf losowy---")
+            generate_and_draw_graph_with_weight(graph, 4, 8)
+        if args.ex == 2:
+            print("--- algorytm Dijkstry---")
+            generate_and_draw_graph_with_weight(graph, 4, 8)
+            s = random.randint(0, len(graph.nodes) - 1)  # source node
+            d = []  # longest path
+            p = []  # predecessor
+            graph.dijkstra(p, d, s)
+        if args.ex == 3:
+            print("--- Macierz odległości---")
+            generate_and_draw_graph_with_weight(graph, 4, 8)
+            matrix = {}
+            graph.distance_matrix(matrix)
+            print_matrix(matrix)
+        if args.ex == 4:
+            generate_and_draw_graph_with_weight(graph, 4, 8)
+            matrix = {}
+            graph.distance_matrix(matrix)
+            print_matrix(matrix)
+            print()
+            center_of_graph(matrix)
+            minimax(matrix)
+
+    if args.project == 1 or args.project == 2:
+        graph.print_all_representations()
     if args.visual:
         graph.draw_nx_graph()
     graph.delete_all()
