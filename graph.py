@@ -25,13 +25,20 @@ class Graph:
         self.edges.append(Edge(start, end))
         return True
 
+    def add_edge_with_weight(self, start, end, weight):
+        if start == end or self.edge_exists(start, end):
+            return False
+        self.edges.append(Edge(start, end))
+        self.weight.append(weight)
+        return True
+
     def add_nodes(self, amount):
         for i in range(amount):
             self.add_node(Node(i))
 
     def add_neighbour(self, node_index, neighbour):
-        if node_index == neighbour or neighbour in self.nodes[
-            node_index].neighbours:
+        if node_index == neighbour or (neighbour in
+                                       self.nodes[node_index].neighbours):
             return False
         self.nodes[node_index].neighbours.append(neighbour)
         return True
@@ -364,6 +371,19 @@ class Graph:
 
     ##### ex 1 #####
 
+    def generete_graph_from_file_with_weights(self, file_name):
+        with open(file_name, 'r') as f:
+            lines = f.readlines()
+        rows = len(lines)
+        self.add_nodes(rows)
+        for i in range(rows):
+            line = lines[i].split(' ')
+            for j in range(len(line)):
+                node = line[j].split(',')[0]
+                weight = line[j].split(',')[1]
+                self.add_neighbour(i, int(node))
+                self.add_edge_with_weight(i, int(node), int(weight))
+
     def generate_random_graph(self, min_nodes, max_nodes):
         # randomizes the number of nodes from the range
         # [min_nodes, max_nodes]
@@ -396,14 +416,13 @@ class Graph:
         plt.show()
 
     ##### ex 2 #####
-
     def init_d_p(self, d, p, s):
         for i in range(len(self.nodes)):
             d.append(float('inf'))
             p.append(None)
         d[s] = 0
 
-    def relax(self, u, neighbour, d, p):  # ( take in eeeeeesy LOVE MIKA)
+    def relax(self, u, neighbour, d, p):  # ( take in eeeeeeasy LOVE MIKA)
         edges = [(edge.start, edge.end) for edge in self.edges]
         try:
             index = edges.index((u, neighbour))
@@ -415,7 +434,6 @@ class Graph:
             p[neighbour] = u
 
     def dijkstra(self, p, d, s, print_s=True):
-
         self.init_d_p(d, p, s)
         S = []  # 'ready' nodes
         while len(S) != len(self.nodes):
@@ -437,7 +455,50 @@ class Graph:
             self.dijkstra(predecessor, distance, i, False)
             matrix[i] = distance
 
+    ##### ex 5 #####
+    def find_edge_to_not_selected_nodes(self, W_numbers, selected):
+        edge = [0, 1]
+        weight = float('inf')
+        for i in range(len(self.edges)):
+            if check_node_prim(self.edges[i].start, self.edges[i].end,
+                               selected.number, W_numbers):
+                if self.weight[i] < weight:
+                    weight = self.weight[i]
+                    edge = [self.edges[i].start,  self.edges[i].end]
+        return edge, weight
 
+    def find_node_by_number(self, number):
+        for node in self.nodes:
+            if node.number == number:
+                return node
+
+    def prim(self):
+        n = len(self.nodes)
+        T = [self.nodes[0]]
+        W = self.nodes[1:]
+        edges = []
+
+        while W:
+            edge = [0, 1]
+            weight = float('inf')
+            W_numbers = [node.number for node in W]
+            for selected in T:
+
+                result = self.find_edge_to_not_selected_nodes(W_numbers , selected)
+                if result[1] < weight:
+                    weight = result[1]
+                    edge = result[0]
+            number = edge[0] if edge[0] in W_numbers else edge[1]
+            node = self.find_node_by_number(number)
+            T.append(node)
+            W.remove(node)
+            edges.append(edge)
+        print(f'Minimum spanning tree: {edges}')
+
+
+
+        # import pdb
+        # pdb.set_trace()
 
 
 

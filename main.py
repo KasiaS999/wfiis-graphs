@@ -21,19 +21,19 @@ if __name__=="__main__":
 
     # filepath = filedialog.askopenfilename(initialdir='examples', filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
     graph = Graph()
-    seq_graphic = [ 4, 2, 2, 3, 2, 1, 4, 2, 2, 2, 2]
+    seq_graphic = [4, 2, 2, 3, 2, 1, 4, 2, 2, 2, 2]
 
     if args.project == 1:
         if args.ex == 1:
             print('---Graf z listy sąsiedztwa---')
             graph.fill_from_adjacency_list("./files/AL.txt")
-            graph.print_all_representations()
-            graph.delete_all()
-            print('---Graf z macierzy sąsiedztwa---')
-            graph.fill_from_adjacency_matrix('./files/AM.txt')
-            graph.print_all_representations()
-            graph.delete_all()
-            print('---Graf z macierzy incydencji---')
+            # graph.print_all_representations()
+            # graph.delete_all()
+            # print('---Graf z macierzy sąsiedztwa---')
+            # graph.fill_from_adjacency_matrix('./files/AM.txt')
+            # graph.print_all_representations()
+            # graph.delete_all()
+            # print('---Graf z macierzy incydencji---')
             graph.fill_from_incidence_matrix('./files/IM.txt')
         if args.ex == 2:
             graph.fill_random_NP(5, 0.8)
@@ -91,6 +91,13 @@ if __name__=="__main__":
             print()
             center_of_graph(matrix)
             minimax(matrix)
+        if args.ex == 5:
+            generate_and_draw_graph_with_weight(graph, 4, 8)
+            #graph.generete_graph_from_file_with_weights('files/W.txt') # żeby stworzyć graf z przykładu
+            # graph.draw_nx_graph_with_weight() # żeby stworzyć graf z przykładu
+            graph.prim()  # to wypisuje krawedzie drzewa
+            draw_minimum_spanning_tree(graph)  # to wylicza i rysuje z biblioteki (żeby porównać)
+
 
     if args.project == 1 or args.project == 2:
         graph.print_all_representations()

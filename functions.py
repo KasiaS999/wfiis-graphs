@@ -1,3 +1,6 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+
 
 def check_graphic_sequence(seq):
     seq = list(seq)
@@ -7,7 +10,7 @@ def check_graphic_sequence(seq):
             return True
         if any(number < 0 for number in seq) or seq[0] >= len(seq):
             return False
-        for i in range(1,seq[0]+1):
+        for i in range(1, seq[0]+1):
             seq[i] -= 1
         seq[0] = 0
         seq.sort(reverse=True)
@@ -83,7 +86,32 @@ def minimax(matrix):
         if max_value < min_max:
             min_max = max_value
             minmax_source = source
-    print(f'Centrum minimax = {min_max} ( odleglosc od najdalszego :'
-          f' {minmax_source})')
+    print(f'Centrum minimax = {minmax_source} ( odleglosc od najdalszego :'
+          f' {min_max})')
+
+
+def check_node_prim(start, end, selected, W_numbers):
+    if start == selected:
+        if end in W_numbers:
+            return True
+    if end == selected:
+        if start in W_numbers:
+            return True
+    return False
+
+
+def draw_minimum_spanning_tree(graph):
+    G = nx.Graph()
+    for node in graph.nodes:
+        G.add_node(node.number)
+    for edge, weight in zip(graph.edges, graph.weight):
+        G.add_edge(edge.start, edge.end, weight=weight)
+    T = nx.minimum_spanning_tree(G)
+    pos = nx.spring_layout(T)
+    plt.figure()
+    nx.draw_networkx(T, pos=pos, with_labels=True, font_weight='bold')
+    labels = nx.get_edge_attributes(T, 'weight')
+    nx.draw_networkx_edge_labels(T, pos, edge_labels=labels)
+    plt.show()
 
 
